@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swanand's Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="stars-bg"></div>
+
+  <div class="dashboard-container">
+    
+    <!-- LEFT SIDE: TERMINAL CONSOLE -->
+    <div class="panel terminal-panel">
+      <div class="panel-header">
+        <div class="window-buttons">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+        </div>
+        <div class="panel-title">swanand_portfolio.sh</div>
+        <div class="session-info">visitor@swanand-dev</div>
+      </div>
+      
+      <div class="terminal-body" id="terminalBody">
+        <div class="terminal-log" id="terminalLog">
+          <div class="terminal-line system-msg">Initializing core components... [OK]</div>
+          <div class="terminal-line system-msg">Establishing secure connection... [OK]</div>
+          <div class="terminal-line system-msg">Welcome to the Interactive Portfolio Console!</div>
+          <div class="terminal-line system-msg">Type <span class="highlight">help</span> and press Enter to see list of commands.</div>
+          <br>
+        </div>
+        
+        <div class="input-line">
+          <span class="prompt">visitor@swanand-dev:~$</span>
+          <input type="text" id="terminalInput" autofocus autocomplete="off" spellcheck="false" placeholder="type a command...">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT SIDE: DASHBOARD & GUI -->
+    <div class="panel gui-panel">
+      
+      <!-- TOP: SYSTEM DIAGNOSTICS -->
+      <div class="diagnostics-widget">
+        <h3 class="widget-title">
+          <span class="pulse-icon"></span> System Status & Metrics
+        </h3>
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">CPU Load</div>
+            <div class="metric-value" id="cpuValue">0.0%</div>
+            <div class="bar-container">
+              <div class="progress-bar" id="cpuBar" style="width: 0%;"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-label">Memory Usage</div>
+            <div class="metric-value" id="memValue">0.0%</div>
+            <div class="bar-container">
+              <div class="progress-bar" id="memBar" style="width: 0%;"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-label">DB Latency</div>
+            <div class="metric-value" id="latencyValue">0.00 ms</div>
+            <div class="bar-container">
+              <div class="progress-bar" id="latencyBar" style="width: 0%;"></div>
+            </div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-label">Host Uptime</div>
+            <div class="metric-value" id="uptimeValue">0s</div>
+            <div class="uptime-icon">⚡ active</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM: TABS -->
+      <div class="tabs-container">
+        <div class="tab-headers">
+          <button class="tab-btn active" onclick="switchTab('about')">About</button>
+          <button class="tab-btn" onclick="switchTab('projects')">Projects</button>
+          <button class="tab-btn" onclick="switchTab('guestbook')">Guestbook</button>
+          <button class="tab-btn" onclick="switchTab('blog')">Blog</button>
+        </div>
+        
+        <div class="tab-content-wrapper">
+          <!-- ABOUT TAB -->
+          <div class="tab-pane active" id="tab-about">
+            <h2>About Me</h2>
+            <p class="lead">Enthusiastic fresher with a Bachelor’s degree in Computer Science (Honors in Artificial Intelligence and Machine Learning), eager to build a fast-growing career in software development. Skilled in Python, SQL, data analysis, and full-stack development, with a passion for learning, developing efficient and scalable solutions.</p>
+            <div class="skills-showcase">
+              <div class="skill-tag">Python</div>
+              <div class="skill-tag">Flask</div>
+              <div class="skill-tag">JavaScript (ES6+)</div>
+              <div class="skill-tag">SQL & ORMs</div>
+              <div class="skill-tag">REST APIs</div>
+              <div class="skill-tag">Docker</div>
+              <div class="skill-tag">Git & CI/CD</div>
+            </div>
+            
+            <div class="social-links">
+              <a href="https://github.com/swanandjoshi30" target="_blank" class="social-btn">🐱 GitHub</a>
+              <a href="https://www.linkedin.com/in/swanand-joshi1212" target="_blank" class="social-btn">💼 LinkedIn</a>
+              <a href="https://leetcode.com/u/Swanand_Joshi/" target="_blank" class="social-btn">💻 LeetCode</a>
+              <a href="mailto:swanandofficial@gmail.com" class="social-btn">📧 Email Me</a>
+              <a href="/download-resume" class="social-btn download-btn">📥 Download Resume</a>
+            </div>
+          </div>
+
+          <!-- PROJECTS TAB -->
+          <div class="tab-pane" id="tab-projects">
+            <h2>Projects</h2>
+            <div class="projects-list">
+              <div class="project-card">
+                <h4>Titan Voice Assistant</h4>
+                <p>Web-based assistant featuring Speech Synthesis, Speech Recognition, and Levenshtein Fuzzy intent matching.</p>
+                <div class="project-tags">Python · Flask · Web Speech API</div>
+              </div>
+              <div class="project-card">
+                <h4>Version Guard</h4>
+                <p>Real-time configuration tracker CLI featuring colored side-by-side diffs, automated monitoring, and transaction logs.</p>
+                <div class="project-tags">Python · Watchdog · Rich · DiffLib</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GUESTBOOK TAB -->
+          <div class="tab-pane" id="tab-guestbook">
+            <h2>Sign the Guestbook</h2>
+            <p class="sub-text">Write a message that will be permanently stored in our SQLite database.</p>
+            
+            <form id="guestbookForm" onsubmit="submitGuestbook(event)">
+              <div class="form-group">
+                <input type="text" id="guestName" placeholder="Your Name / Company" required maxlength="100">
+              </div>
+              <div class="form-group">
+                <textarea id="guestMessage" placeholder="Leave a feedback message..." required maxlength="500"></textarea>
+              </div>
+              <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+            
+            <hr class="separator">
+            
+            <h3>Recent Logged Messages</h3>
+            <div class="messages-list" id="messagesList">
+              <!-- Dynamically populated -->
+              <p class="loading">Loading messages...</p>
+            </div>
+          </div>
+
+          <!-- BLOG TAB -->
+          <div class="tab-pane" id="tab-blog">
+            <h2>Developer Log (Blog)</h2>
+            <p class="sub-text">Dynamic articles parsed directly from markdown files on the server.</p>
+            <div class="blog-list" id="blogList">
+              <!-- Dynamically populated -->
+              <p class="loading">Loading blog posts...</p>
+            </div>
+            <div class="blog-reader" id="blogReader" style="display: none;">
+              <button class="back-btn" onclick="closeBlogReader()">← Back to list</button>
+              <div id="blogContent"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

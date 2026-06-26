@@ -1,0 +1,21 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# SQLite Database and Instance configuration
+instance/
+*.db
+
+# Local environment secret variables
+.env
+.env.local
+
+# IDE settings
+.vscode/
+.idea/
