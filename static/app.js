@@ -30,23 +30,62 @@ const COMMANDS = {
   'blog view <slug>': 'Read a specific blog post in the terminal',
   guestbook: 'Show recent visitor guestbook signatures',
   'guestbook sign "<name>" "<msg>"': 'Write a message directly to SQLite from terminal',
-  'admin login <password>': 'Log in as administrator to manage entries',
+  'admin login': 'Log in as administrator to manage entries',
   'admin delete <id>': 'Delete a guestbook entry by its Database ID',
   'admin logout': 'Log out from admin session',
   clear: 'Clear terminal screen log'
 };
 
+let isPasswordPrompt = false;
+
 // Handle Terminal Inputs
 if (terminalInput) {
   terminalInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-      const commandText = terminalInput.value.trim();
+      const val = terminalInput.value;
       terminalInput.value = '';
-      if (commandText) {
-        processCommand(commandText);
+      
+      if (isPasswordPrompt) {
+        handlePasswordInput(val);
+      } else {
+        const commandText = val.trim();
+        if (commandText) {
+          processCommand(commandText);
+        }
       }
     }
   });
+}
+
+async function handlePasswordInput(password) {
+  // Reset input type to normal text
+  terminalInput.type = 'text';
+  isPasswordPrompt = false;
+
+  // Print masked echo to show action taken
+  printToTerminal('visitor@swanand-dev:~$ admin login [hidden]', 'command-echo');
+
+  if (!password) {
+    printToTerminal('Error: Password cannot be empty.', 'error-msg');
+    return;
+  }
+
+  try {
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    if (response.ok) {
+      printToTerminal('Access Granted: Logged in as Administrator.', 'highlight');
+      loadGuestbookMessages(); // Refresh GUI
+    } else {
+      const data = await response.json();
+      printToTerminal(`Access Denied: ${data.error || 'Invalid password.'}`, 'error-msg');
+    }
+  } catch (e) {
+    printToTerminal('Connection error. Failed to login.', 'error-msg');
+  }
 }
 
 function printToTerminal(text, className = 'output-msg') {
@@ -58,11 +97,17 @@ function printToTerminal(text, className = 'output-msg') {
 }
 
 async function processCommand(cmdLine) {
-  // Print Command Echo
-  printToTerminal(`visitor@swanand-dev:~$ ${cmdLine}`, 'command-echo');
-
+  let echoLine = cmdLine;
   const tokens = cmdLine.split(' ');
   const primaryCmd = tokens[0].toLowerCase();
+
+  // If user typed admin login password directly, mask it in echo
+  if (primaryCmd === 'admin' && tokens[1] === 'login' && tokens[2]) {
+    echoLine = `admin login ` + '*'.repeat(tokens[2].length);
+  }
+
+  // Print Command Echo
+  printToTerminal(`visitor@swanand-dev:~$ ${echoLine}`, 'command-echo');
 
   switch (primaryCmd) {
     case 'clear':
@@ -70,8 +115,27 @@ async function processCommand(cmdLine) {
       break;
 
     case 'help':
+      // Check admin status dynamically
+      let isAdmin = false;
+      try {
+        const statusRes = await fetch('/api/admin/status');
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          isAdmin = statusData.is_admin;
+        }
+      } catch (err) {}
+
       let helpStr = 'Available Commands:<br><table style="width:100%; border-collapse:collapse; margin-top:5px; font-family:inherit; font-size:0.85rem;">';
       for (const [cmd, desc] of Object.entries(COMMANDS)) {
+        // Skip admin delete and logout if not logged in as admin
+        if (!isAdmin && (cmd.startsWith('admin delete') || cmd.startsWith('admin logout'))) {
+          continue;
+        }
+        // If logged in as admin, hide the 'admin login' option
+        if (isAdmin && cmd.startsWith('admin login')) {
+          continue;
+        }
+
         helpStr += `<tr>
           <td style="width:35%; min-width:140px; color:var(--terminal-magenta); font-weight:bold; padding:3px 0; vertical-align:top;">${cmd}</td>
           <td style="color:var(--text-muted); padding:3px 0; vertical-align:top;">- ${desc}</td>
@@ -244,7 +308,9 @@ async function processCommand(cmdLine) {
       if (subAdminCmd === 'login') {
         const password = tokens[2];
         if (!password) {
-          printToTerminal('Error: Specify password. Usage: admin login <password>', 'error-msg');
+          printToTerminal('Enter Password:');
+          terminalInput.type = 'password';
+          isPasswordPrompt = true;
           return;
         }
         try {
